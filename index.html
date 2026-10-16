@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mente Lógica — Desafio Mental</title>
+<style>
+:root {
+  --lav:#cbb7ff;
+  --muted:#c7c4e5;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; min-height:100vh; display:flex; align-items:center;
+  justify-content:center; padding:24px;
+  font-family:Inter,system-ui,Arial,sans-serif; color:white;
+  background:
+    radial-gradient(ellipse at 15% 15%,#493a8b,transparent 36%),
+    radial-gradient(ellipse at 85% 80%,#713e94,transparent 35%),
+    linear-gradient(135deg,#090a1b,#171633 52%,#26143d);
+  background-attachment:fixed;
+}
+.card {
+  width:100%; max-width:740px; padding:clamp(20px,5vw,38px);
+  background:linear-gradient(145deg,#1e1c40f5,#12112af7);
+  border:1px solid #bfacff45; border-radius:28px;
+  box-shadow:0 30px 90px #05040dcc;
+}
+h1,h2 { text-align:center; color:#e0d3ff; }
+h1 { font-size:clamp(27px,5vw,38px); }
+p { text-align:center; line-height:1.65; color:var(--muted); }
+.hero-mark {
+  width:76px; height:76px; margin:auto; display:grid;
+  place-items:center; border-radius:24px; font-size:39px;
+  background:linear-gradient(145deg,#a78bfa33,#e879f933);
+  border:1px solid #c4b5fd55; box-shadow:0 12px 36px #8b5cf633;
+}
+.eyebrow {
+  display:table; margin:15px auto 8px; padding:7px 12px;
+  border:1px solid #8f7ad855; border-radius:999px;
+  background:#8f7ad81c; color:#dfd4ff;
+  font-size:11px; font-weight:800; letter-spacing:.14em;
+}
+.characters {
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px; margin:22px 0;
+}
+button,select { font:inherit; }
+button {
+  border:0; border-radius:13px; padding:14px;
+  font-size:15px; font-weight:700; cursor:pointer;
+  transition:transform .18s,filter .18s;
+}
+button:hover:not(:disabled) { transform:translateY(-2px); filter:brightness(1.12); }
+button:focus-visible { outline:3px solid white; outline-offset:3px; }
+.character {
+  min-width:0; padding:17px 8px; color:white;
+  background:linear-gradient(145deg,#29264f,#211f42);
+  border:1px solid #514b7d; border-radius:18px;
+}
+.character.selected {
+  border-color:#c3aaff;
+  background:linear-gradient(145deg,#493a78,#302451);
+  box-shadow:0 0 0 3px #b69aff20;
+}
+.avatar { display:block; font-size:43px; margin-bottom:10px; }
+.character small { color:#c8c1eb; font-size:11px; }
+label { display:block; margin:20px 0 9px; color:#e1d9ff; font-weight:650; }
+select {
+  width:100%; padding:15px; border-radius:13px;
+  background:#211f42; color:white; border:1px solid #62578f;
+  font-size:16px;
+}
+.difficulty-note {
+  padding:12px 14px; margin-top:12px; border-radius:13px;
+  background:#a78bfa12; border:1px solid #8e7cbd55;
+  color:#e5dcff; font-size:13px;
+}
+.primary {
+  width:100%; margin-top:20px; color:white;
+  background:linear-gradient(100deg,#8066ff,#ad75ff 55%,#d181f2);
+  box-shadow:0 8px 25px #8e62ff40;
+}
+.hidden { display:none !important; }
+.stats { display:flex; gap:12px; margin:20px 0; }
+.stat {
+  flex:1; padding:14px 10px; border-radius:15px;
+  text-align:center; font-size:12px; text-transform:uppercase;
+  color:#c8c3e7; background:linear-gradient(145deg,#2a2751,#211f40);
+  border:1px solid #49436f;
+}
+.stat strong { display:block; color:#e1d5ff; font-size:25px; margin-top:7px; }
+.topline {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; color:#d7ceff; font-size:14px; font-weight:650;
+}
+.timer { font-size:20px; font-weight:800; font-variant-numeric:tabular-nums; }
+.bar { height:11px; background:#39355d; border-radius:20px; overflow:hidden; margin:14px 0 23px; }
+.fill {
+  height:100%; width:100%; border-radius:20px;
+  background:linear-gradient(90deg,#9175ff,#e3a4ff);
+  box-shadow:0 0 18px #b794ff88; transition:width .3s;
+}
+.warning { color:#ff9ba9; animation:pulse .8s infinite alternate; }
+.question { font-size:clamp(20px,4vw,25px); line-height:1.5; margin:22px 0; }
+.answers { display:grid; gap:11px; }
+.answer {
+  width:100%; text-align:left; color:white; line-height:1.5;
+  padding:15px 16px; background:linear-gradient(100deg,#29264e,#252244);
+  border:1px solid #4b4577;
+}
+.answer:disabled { opacity:1; cursor:default; }
+.correct { background:linear-gradient(100deg,#185b49,#1e7056)!important; border-color:#43d6a0!important; }
+.wrong { background:linear-gradient(100deg,#713443,#873d50)!important; border-color:#ff8095!important; }
+.feedback {
+  padding:16px; margin-top:16px; border-radius:14px;
+  background:#29264e; border:1px solid #49436f;
+  line-height:1.65; color:#f1edff;
+}
+.actions { display:flex; gap:12px; margin-top:16px; }
+.actions button { flex:1; }
+.hint { background:#39345f; border:1px solid #5e548b; color:#e2d8ff; }
+.next { background:linear-gradient(100deg,#a77aff,#d181f2); color:#17102e; }
+.result { text-align:center; }
+.result .avatar { font-size:66px; }
+@keyframes pulse { to { opacity:.55; } }
+@media(max-width:480px) {
+  body { padding:12px; }
+  .card { padding:22px 16px; border-radius:22px; }
+  .characters { gap:7px; }
+  .character { padding:13px 4px; font-size:12px; }
+  .character .avatar { font-size:35px; }
+  .actions { flex-direction:column; }
+  .stats { gap:8px; }
+  .stat { padding:12px 6px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*:before,*:after { animation:none!important; transition:none!important; }
+}
+</style>
+</head>
+<body>
+<main class="card">
+
+<section id="start">
+  <div class="hero-mark">🧠</div>
+  <div class="eyebrow">✦ DESAFIO MENTAL</div>
+  <h1>Mente Lógica</h1>
+  <p>Escolha seu personagem, corra contra o tempo e resolva os desafios!</p>
+  <h2>Escolha seu personagem</h2>
+
+  <div class="characters" id="characters">
+    <button class="character selected" data-name="Luna">
+      <span class="avatar">🧙‍♀️</span>Luna<br><small>Mestra dos enigmas</small>
+    </button>
+    <button class="character" data-name="Theo">
+      <span class="avatar">🕵️‍♂️</span>Theo<br><small>Detetive lógico</small>
+    </button>
+    <button class="character" data-name="Max">
+      <span class="avatar">🤖</span>Max<br><small>Robô genial</small>
+    </button>
+  </div>
+
+  <label for="difficulty">Escolha a dificuldade</label>
+  <select id="difficulty">
+    <option value="facil">🟢 Fácil · 90 segundos</option>
+    <option value="medio">🟡 Médio · 60 segundos</option>
+    <option value="dificil">🔴 Difícil · 40 segundos</option>
+  </select>
+
+  <div class="difficulty-note" id="difficultyInfo">
+    ⏳ Você terá <strong>90 segundos</strong> para resolver as 5 perguntas deste nível.
+  </div>
+  <button class="primary" id="startBtn">Começar jogo 🚀</button>
+</section>
+
+<section id="game" class="hidden">
+  <div class="topline">
+    <span id="who">🧙‍♀️ Luna</span>
+    <span class="timer" id="timer">⏱️ 90s</span>
+  </div>
+  <div class="bar"><div class="fill" id="timeFill"></div></div>
+  <div class="topline">
+    <span id="levelLabel">Nível fácil</span>
+    <span id="progressText">Pergunta 1/5</span>
+  </div>
+  <div class="stats">
+    <div class="stat">Pontos<strong id="score">0</strong></div>
+    <div class="stat">Acertos<strong id="hits">0</strong></div>
+  </div>
+  <h2 class="question" id="question"></h2>
+  <div class="answers" id="answers"></div>
+  <div class="feedback hidden" id="feedback" aria-live="polite"></div>
+  <div class="actions">
+    <button class="hint" id="hintBtn">💡 Dica</button>
+    <button class="next hidden" id="nextBtn">Próxima ➜</button>
+  </div>
+</section>
+
+<section id="result" class="result hidden">
+  <div class="avatar" id="resultAvatar">🏆</div>
+  <h1 id="resultTitle">Desafio concluído!</h1>
+  <p id="resultText"></p>
+  <div class="stats">
+    <div class="stat">Pontuação<strong id="finalScore">0</strong></div>
+    <div class="stat">Acertos<strong id="finalHits">0/5</strong></div>
+  </div>
+  <button class="primary" id="againBtn">Jogar novamente 🔄</button>
+</section>
+
+</main>
+
+<script>
+const bank = {
+facil: [
+ {q:"Qual número vem a seguir: 2, 4, 6, 8, __?",o:["9","10","12","14"],a:1,h:"Os números aumentam sempre pela mesma quantidade.",e:"A sequência aumenta de 2 em 2. O próximo é 10."},
+ {q:"Ana tem 3 maçãs e ganha mais 4. Quantas tem?",o:["6","7","8","9"],a:1,h:"Some as maçãs que ela tinha às que ganhou.",e:"3 + 4 = 7 maçãs."},
+ {q:"Qual figura não tem lados retos?",o:["Triângulo","Quadrado","Círculo","Retângulo"],a:2,h:"Pense na figura redonda.",e:"O círculo não possui lados retos."},
+ {q:"Se hoje é segunda-feira, daqui a 3 dias será…",o:["Terça","Quarta","Quinta","Sexta"],a:2,h:"Conte terça como o primeiro dia.",e:"Terça, quarta, quinta: são 3 dias."},
+ {q:"Complete: 5, 10, 15, 20, __.",o:["22","24","25","30"],a:2,h:"Some 5 a cada número.",e:"O próximo é 25."}
+],
+medio: [
+ {q:"Qual número vem a seguir: 3, 6, 12, 24, __?",o:["30","36","42","48"],a:3,h:"Cada número é multiplicado por 2.",e:"24 × 2 = 48."},
+ {q:"Todos os gatos são animais. Mimi é um gato. Logo…",o:["Mimi é um animal","Todos animais são gatos","Mimi é um cachorro","Nada podemos concluir"],a:0,h:"Use as duas informações do enunciado.",e:"Se todo gato é animal e Mimi é gato, Mimi é animal."},
+ {q:"Uma caixa tem 4 pares de meias. Quantas meias há?",o:["4","6","8","12"],a:2,h:"Um par tem duas meias.",e:"4 × 2 = 8 meias."},
+ {q:"Qual número falta: 1, 4, 9, 16, __?",o:["20","24","25","36"],a:2,h:"São quadrados: 1², 2², 3², 4²…",e:"5² = 25."},
+ {q:"Pedro é mais velho que Lucas. Lucas é mais velho que Caio. Quem é mais novo?",o:["Pedro","Lucas","Caio","Não dá para saber"],a:2,h:"Organize os três por idade.",e:"Caio é mais novo que Lucas e Pedro."}
+],
+dificil: [
+ {q:"Complete: 2, 6, 12, 20, 30, __.",o:["36","40","42","44"],a:2,h:"As diferenças são 4, 6, 8 e 10.",e:"A próxima diferença é 12; 30 + 12 = 42."},
+ {q:"5 máquinas fazem 5 peças em 5 minutos. Quanto 100 máquinas levam para fazer 100 peças?",o:["5 minutos","20 minutos","100 minutos","500 minutos"],a:0,h:"Todas as máquinas trabalham ao mesmo tempo.",e:"Cada máquina faz uma peça em 5 minutos; juntas fazem 100 em 5 minutos."},
+ {q:"Qual número vem a seguir: 1, 1, 2, 3, 5, 8, __?",o:["11","12","13","15"],a:2,h:"Some os dois números anteriores.",e:"5 + 8 = 13."},
+ {q:"Um relógio marca 3h15. Qual é o menor ângulo entre os ponteiros?",o:["0°","7,5°","15°","30°"],a:1,h:"O ponteiro das horas já avançou um pouco após o 3.",e:"O ponteiro dos minutos está em 90° e o das horas em 97,5°. Diferença: 7,5°."},
+ {q:"Se todos os blips são zargs e nenhum zarg é azul, um blip pode ser azul?",o:["Sim, sempre","Não","Só à noite","Não dá para saber"],a:1,h:"Os blips pertencem ao grupo dos zargs.",e:"Nenhum zarg é azul, então nenhum blip pode ser azul."}
+]
+};
+
+const avatars = {Luna:"🧙‍♀️",Theo:"🕵️‍♂️",Max:"🤖"};
+const timeLimits = {facil:90, medio:60, dificil:40};
+
+let character="Luna", level="facil", index=0;
+let score=0, hits=0, remaining=90, maxTime=90;
+let tick=null, answered=false, hintUsed=false;
+
+const $ = id => document.getElementById(id);
+
+$("characters").addEventListener("click", e => {
+  const b = e.target.closest("button[data-name]");
+  if (!b) return;
+  character = b.dataset.name;
+  document.querySelectorAll(".character").forEach(x =>
+    x.classList.toggle("selected", x === b)
+  );
+});
+
+function screen(id) {
+  ["start","game","result"].forEach(x =>
+    $(x).classList.toggle("hidden", x !== id)
+  );
+}
+
+function start() {
+  level = $("difficulty").value;
+  index = 0;
+  score = 0;
+  hits = 0;
+  maxTime = timeLimits[level];
+  remaining = maxTime;
+  clearInterval(tick);
+
+  $("who").textContent = avatars[character] + " " + character;
+  $("levelLabel").textContent =
+    "Nível " + ({facil:"fácil",medio:"médio",dificil:"difícil"}[level]);
+  $("score").textContent = 0;
+  $("hits").textContent = 0;
+
+  screen("game");
+  render();
+  updateTimer();
+
+  tick = setInterval(() => {
+    remaining--;
+    updateTimer();
+    if (remaining <= 0) {
+      clearInterval(tick);
+      finish(true);
+    }
+  }, 1000);
+}
+
+function updateTimer() {
+  $("timer").textContent = "⏱️ " + remaining + "s";
+  const danger = Math.min(15, Math.ceil(maxTime * .25));
+  $("timer").classList.toggle("warning", remaining <= danger);
+  $("timeFill").style.width = (remaining / maxTime * 100) + "%";
+  $("timeFill").style.background = remaining <= danger
+    ? "linear-gradient(90deg,#ff758f,#ffb0bd)"
+    : "linear-gradient(90deg,#9175ff,#e3a4ff)";
+}
+
+function render() {
+  const item = bank[level][index];
+  answered = false;
+  hintUsed = false;
+
+  $("progressText").textContent = "Pergunta " + (index+1) + "/5";
+  $("question").textContent = item.q;
+  $("answers").innerHTML = "";
+  $("feedback").classList.add("hidden");
+  $("hintBtn").classList.remove("hidden");
+  $("hintBtn").disabled = false;
+  $("hintBtn").textContent = "💡 Dica";
+  $("nextBtn").classList.add("hidden");
+
+  item.o.forEach((op,i) => {
+    const b = document.createElement("button");
+    b.className = "answer";
+    b.textContent = String.fromCharCode(65+i) + ") " + op;
+    b.addEventListener("click", () => choose(i));
+    $("answers").appendChild(b);
+  });
+}
+
+function choose(n) {
+  if (answered) return;
+  answered = true;
+
+  const item = bank[level][index];
+  const buttons = $("answers").querySelectorAll("button");
+  const ok = n === item.a;
+
+  buttons.forEach((b,i) => {
+    b.disabled = true;
+    if (i === item.a) b.classList.add("correct");
+    else if (i === n) b.classList.add("wrong");
+  });
+
+  if (ok) {
+    hits++;
+    score += hintUsed ? 10 : 20;
+  }
+
+  $("score").textContent = score;
+  $("hits").textContent = hits;
+  $("feedback").textContent = (ok ? "✅ Correto! " : "❌ Quase! ") + item.e;
+  $("feedback").classList.remove("hidden");
+  $("hintBtn").classList.add("hidden");
+  $("nextBtn").classList.remove("hidden");
+  $("nextBtn").textContent = index === 4 ? "Ver resultado 🏆" : "Próxima ➜";
+}
+
+function hint() {
+  if (answered || hintUsed) return;
+  hintUsed = true;
+  $("feedback").textContent = "💡 Dica: " + bank[level][index].h;
+  $("feedback").classList.remove("hidden");
+  $("hintBtn").disabled = true;
+  $("hintBtn").textContent = "Dica usada";
+}
+
+function next() {
+  if (index < 4) {
+    index++;
+    render();
+  } else {
+    finish(false);
+  }
+}
+
+function finish(timeUp) {
+  clearInterval(tick);
+  screen("result");
+  $("resultAvatar").textContent = avatars[character];
+  $("resultTitle").textContent = timeUp
+    ? "⏰ O tempo acabou!" : "🏆 Desafio concluído!";
+  $("resultText").textContent =
+    character + " acertou " + hits + " de 5 perguntas e fez " +
+    score + " pontos." +
+    (timeUp ? " O tempo terminou." : " Você terminou antes do fim do tempo!");
+  $("finalScore").textContent = score;
+  $("finalHits").textContent = hits + "/5";
+}
+
+$("difficulty").addEventListener("change", () => {
+  const t = timeLimits[$("difficulty").value];
+  $("difficultyInfo").innerHTML =
+    "⏳ Você terá <strong>" + t +
+    " segundos</strong> para resolver as 5 perguntas deste nível.";
+});
+
+$("startBtn").addEventListener("click", start);
+$("hintBtn").addEventListener("click", hint);
+$("nextBtn").addEventListener("click", next);
+$("againBtn").addEventListener("click", () => {
+  clearInterval(tick);
+  screen("start");
+});
+</script>
+</body>
+</html>
